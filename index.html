@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eggnesdiary — explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="easter.css">
+  <style>
+    /* Viewer-only tweaks */
+    .detail-actions { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Title Bar -->
+<div class="title-bar">
+  <span class="icon">🥚</span>
+  <span class="title">eggnesdiary — File Explorer</span>
+  <div class="win-controls">
+    <button class="win-btn">─</button>
+    <button class="win-btn">□</button>
+    <button class="win-btn close">✕</button>
+  </div>
+</div>
+
+<!-- Menu Bar -->
+<div class="menu-bar">
+  <span class="menu-item">File</span>
+  <span class="menu-item">Edit</span>
+  <span class="menu-item">View</span>
+  <span class="menu-item">Help</span>
+  <span class="menu-sep"></span>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+  <a class="menu-link" href="editor.html">✏️ Editor</a>
+</div>
+
+<!-- Sidebar backdrop (mobile) -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+<!-- Toolbar / Address Bar -->
+<div class="toolbar">
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle folders">☰</button>
+  <button class="toolbar-btn" id="btnBack" disabled>‹ Back</button>
+  <button class="toolbar-btn" id="btnUp">↑ Up</button>
+  <div class="address-bar">
+    <span>📂</span>
+    <span class="path" id="addressPath">eggnesdiary</span>
+  </div>
+  <button class="toolbar-btn" id="btnSearch">🔍 Search</button>
+</div>
+
+<!-- Explorer Body -->
+<div class="explorer">
+
+  <!-- Tree -->
+  <div class="tree-panel">
+    <div class="tree-header">Folders</div>
+    <div class="tree-item active" data-folder="all" onclick="selectFolder('all')">
+      <span class="folder-icon">🥚</span>
+      <span>eggnesdiary</span>
+      <span class="count" id="count-all">0</span>
+    </div>
+    <div class="tree-divider"></div>
+    <div id="treeList"></div>
+  </div>
+
+  <!-- File Pane -->
+  <div class="file-pane">
+    <div class="pane-toolbar">
+      <span class="label">View:</span>
+      <button class="view-btn active" id="viewIcons" title="Icons" onclick="setView('icons')">⊞</button>
+      <button class="view-btn" id="viewList" title="List" onclick="setView('list')">☰</button>
+      <select class="sort-select" id="sortSelect" onchange="renderFiles()">
+        <option value="date-desc">Newest first</option>
+        <option value="date-asc">Oldest first</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+      </select>
+    </div>
+
+    <div class="file-grid view-icons" id="fileGrid"></div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel hidden" id="detailPanel">
+    <div class="sheet-handle"></div>
+    <div class="detail-header">
+      <span class="dh-icon" id="dhIcon"></span>
+      <div class="dh-info">
+        <div class="dh-title" id="dhTitle"></div>
+        <div class="dh-sub" id="dhSub"></div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+    <div class="detail-actions" id="detailActions"></div>
+  </div>
+
+</div>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <span id="statusCount">0 items</span>
+  <span class="status-sep"></span>
+  <span id="statusSel">Nothing selected</span>
+  <span class="status-sep"></span>
+  <span id="statusFolder">eggnesdiary</span>
+</div>
+
+<!-- Search overlay (simple) -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal" style="width:400px">
+    <div class="modal-titlebar">
+      🔍 Search eggnesdiary
+      <button class="mt-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Search</label>
+        <input type="text" id="searchInput" placeholder="Type to search titles, tags, content…" oninput="doSearch()">
+      </div>
+      <div id="searchResults" style="margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="viewer.js"></script>
+<script src="easter.js"></script>
+<script src="window.js"></script>
+<script src="sparkle.js"></script>
+</body>
+</html>

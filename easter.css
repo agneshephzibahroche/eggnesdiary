@@ -1,0 +1,436 @@
+/* ── Mini Y2K Desktop ────────────────────────────────────────────── */
+@keyframes xpdFadeIn  { from { opacity:0; transform:scale(.97) } to { opacity:1; transform:scale(1) } }
+@keyframes xpdFadeOut { from { opacity:1 } to { opacity:0; transform:scale(.97) } }
+@keyframes twinkle { 0%,100%{opacity:.3} 50%{opacity:1} }
+@keyframes twinkle2 { 0%,100%{opacity:.6} 50%{opacity:.15} }
+@keyframes aurora { 0%,100%{opacity:.4;transform:scaleX(1)} 50%{opacity:.7;transform:scaleX(1.08)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+/* ── Sparkle cursor trail ────────────────────────────────────────── */
+@keyframes sparkleOut {
+  0%   { transform: translate(-50%,-50%) scale(1) rotate(0deg);   opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(0) rotate(180deg); opacity: 0; }
+}
+.sparkle-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  font-size: 14px;
+  line-height: 1;
+  animation: sparkleOut .7s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+#xpDesktop {
+  position: fixed; inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Nunito', 'Tahoma', sans-serif;
+  font-size: 12px;
+}
+
+/* ── Y2K Night Sky Wallpaper ─────────────────────────────────────── */
+.xpd-bliss {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    #000010 0%,
+    #050022 15%,
+    #0d0038 30%,
+    #1a004d 45%,
+    #2d0055 58%,
+    #440044 70%,
+    #5c0044 80%,
+    #440033 90%,
+    #330022 100%
+  );
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Star layers */
+.xpd-bliss::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 5%, #ffccff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 22% 18%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 8%, #ffaaff 0%, transparent 100%),
+    radial-gradient(2px 2px at 38% 3%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 45% 14%, #ccccff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 52% 7%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 19%, #ffccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 67% 4%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 74% 11%, #ffaaff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 82% 6%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 89% 16%, #ccccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 94% 9%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 11% 28%, #fff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 19% 35%, #ffccff 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 25%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 36% 32%, #ffaaff 0%, transparent 100%),
+    radial-gradient(1px 1px at 48% 27%, #fff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 56% 38%, #ccccff 0%, transparent 100%),
+    radial-gradient(1px 1px at 64% 22%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 72% 31%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 24%, #ffccff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 88% 36%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 96% 28%, #ffaaff 0%, transparent 100%),
+    radial-gradient(1px 1px at 5% 42%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 13% 48%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 24% 44%, #ffccff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 33% 52%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 46%, #ccccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 51% 40%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 62% 50%, #ffaaff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 71% 43%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 79% 55%, #ffccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 91% 47%, #fff 0%, transparent 100%);
+  animation: twinkle 4s infinite alternate ease-in-out;
+}
+.xpd-bliss::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 4% 22%, #ffccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 17% 60%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 26% 55%, #ffaaff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 35% 68%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 43% 63%, #ccccff 0%, transparent 100%),
+    radial-gradient(2px 2px at 54% 58%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 66% 65%, #ffccff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 77% 60%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 72%, #ffaaff 0%, transparent 100%),
+    radial-gradient(2px 2px at 93% 58%, #fff 0%, transparent 100%),
+    radial-gradient(3px 3px at 20% 10%, #ffffcc 0%, transparent 100%),
+    radial-gradient(3px 3px at 55% 15%, #ffccff 0%, transparent 100%),
+    radial-gradient(2.5px 2.5px at 78% 8%, #ccffff 0%, transparent 100%),
+    radial-gradient(2.5px 2.5px at 90% 20%, #ffffcc 0%, transparent 100%);
+  animation: twinkle2 6s infinite alternate ease-in-out;
+  animation-delay: -2s;
+}
+
+/* Aurora effect */
+.xpd-aurora {
+  position: absolute;
+  bottom: 28%; left: -10%; right: -10%;
+  height: 200px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(180,0,220,.25) 15%,
+    rgba(220,0,180,.35) 30%,
+    rgba(120,0,255,.2) 45%,
+    rgba(0,180,255,.15) 55%,
+    rgba(180,0,220,.3) 70%,
+    rgba(255,0,160,.25) 85%,
+    transparent 100%
+  );
+  filter: blur(20px);
+  animation: aurora 8s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* Moon */
+.xpd-moon {
+  position: absolute;
+  top: 8%; right: 12%;
+  width: 52px; height: 52px;
+  background: radial-gradient(circle at 35% 35%, #fff8f0, #ffe8d0 40%, #ffcc99 70%, #ffaa66);
+  border-radius: 50%;
+  box-shadow:
+    0 0 20px rgba(255,220,150,.6),
+    0 0 50px rgba(255,180,100,.2);
+  z-index: 2;
+  animation: float 6s ease-in-out infinite;
+}
+.xpd-moon::before {
+  content: '';
+  position: absolute;
+  top: 8px; left: 18px;
+  width: 14px; height: 14px;
+  background: rgba(200,140,80,.3);
+  border-radius: 50%;
+  box-shadow: -8px 10px 0 rgba(200,140,80,.2), 6px 18px 0 4px rgba(200,140,80,.15);
+}
+
+/* Floating sparkle glitter */
+.xpd-glitter {
+  position: absolute;
+  font-size: 13px;
+  z-index: 2;
+  pointer-events: none;
+  animation: float linear infinite;
+  opacity: .7;
+}
+
+/* Desktop icons */
+.xpd-icons {
+  position: absolute;
+  top: 12px; left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 3;
+}
+.xpd-icon {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  padding: 6px 6px;
+  width: 74px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  text-align: center;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.9), 0 0 8px rgba(255,100,255,.5);
+  font-size: 11px;
+  font-weight: 700;
+  transition: background .1s, border-color .1s;
+}
+.xpd-icon span:first-child { font-size: 28px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,150,255,.6)); }
+.xpd-icon span:last-child { font-size: 10px; line-height: 1.3; }
+.xpd-icon:hover   { background: rgba(220,0,180,.35); border-color: rgba(255,150,255,.6); }
+.xpd-icon.selected { background: rgba(180,0,220,.5); border-color: rgba(255,180,255,.8); }
+
+#xpdWindows { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+
+/* ── Y2K Mini Windows ─────────────────────────────────────────────── */
+.xpd-window {
+  position: absolute;
+  background: #fff0fc;
+  border: 2px solid #aa0077;
+  border-top-color: #ff99ee;
+  border-left-color: #ff99ee;
+  box-shadow: 3px 3px 12px rgba(150,0,150,.5);
+  display: flex; flex-direction: column;
+  border-radius: 10px 10px 4px 4px;
+  overflow: hidden;
+  pointer-events: all;
+  min-width: 200px; min-height: 120px;
+}
+.xpd-win-title {
+  background: linear-gradient(to right, #5b0092, #cc00bb 55%, #ff99ee);
+  color: #fff;
+  padding: 5px 8px;
+  display: flex; align-items: center;
+  font-size: 12px; font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.6);
+  gap: 6px; flex-shrink: 0;
+  border-radius: 8px 8px 0 0;
+}
+.xpd-win-title span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.xpd-win-btns { display: flex; gap: 3px; flex-shrink: 0; }
+.xpd-wbtn {
+  width: 18px; height: 18px; border-radius: 50%;
+  cursor: pointer; font-size: 9px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,.5);
+  background: linear-gradient(to bottom, #ff99ee, #dd00aa 50%, #aa0077 51%, #cc22aa);
+  color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+.xpd-wbtn:hover { filter: brightness(1.2); }
+.xpd-wbtn.close { background: linear-gradient(to bottom, #ff6699, #ee0044 50%, #bb0033 51%, #dd2255); }
+.xpd-win-body { flex: 1; background: #fff; overflow: auto; font-size: 12px; }
+
+/* ── Y2K Taskbar ──────────────────────────────────────────────────── */
+.xpd-taskbar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 34px;
+  background: linear-gradient(to bottom,
+    #aa0088 0%, #cc22aa 15%, #aa0088 16%,
+    #880066 50%, #660044 51%, #880066 100%
+  );
+  border-top: 1px solid #ff66cc;
+  display: flex; align-items: center;
+  gap: 4px; padding: 0 4px;
+  z-index: 10;
+  box-shadow: 0 -1px 0 rgba(255,180,255,.4);
+}
+
+.xpd-start {
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 12px 2px 8px; height: 26px;
+  background: linear-gradient(to bottom, #ff88ee 0%, #ee00aa 50%, #cc0088 51%, #ee22bb 100%);
+  border: 1px solid #880066;
+  border-top-color: #ffbbee;
+  border-radius: 12px;
+  color: #fff; font-size: 12px; font-weight: 700;
+  font-family: 'Nunito', Tahoma, sans-serif;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  box-shadow: 0 0 8px rgba(255,100,220,.5);
+  flex-shrink: 0; letter-spacing: .3px;
+  transition: filter .1s;
+}
+.xpd-start:hover, .xpd-start.active { filter: brightness(1.15); box-shadow: 0 0 14px rgba(255,100,220,.7); }
+.xpd-start-logo { font-size: 15px; }
+
+.xpd-taskbtns { display: flex; gap: 2px; flex: 1; overflow: hidden; }
+.xpd-taskbtn {
+  padding: 2px 8px; height: 22px;
+  background: linear-gradient(to bottom, #880066, #660044);
+  border: 1px solid #440033; border-top-color: #cc66aa;
+  color: #ffccff; font-size: 10px; font-weight: 700;
+  font-family: 'Nunito', Tahoma, sans-serif;
+  cursor: pointer; border-radius: 3px;
+  max-width: 130px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.xpd-taskbtn:hover { background: linear-gradient(to bottom, #aa0077, #880055); }
+
+.xpd-tray {
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 8px; height: 26px;
+  background: linear-gradient(to bottom, #660044, #550033);
+  border: 1px solid #440033; border-top-color: #aa6688;
+  border-radius: 3px; color: #ffccff; flex-shrink: 0;
+}
+.xpd-tray-icon { font-size: 13px; cursor: pointer; opacity: .85; }
+.xpd-tray-icon:hover { opacity: 1; }
+.xpd-clock { font-size: 10px; font-weight: 700; color: #ffccff; padding-left: 6px; border-left: 1px solid rgba(255,180,255,.25); white-space: nowrap; }
+
+/* ── Y2K Start Menu ───────────────────────────────────────────────── */
+.xpd-startmenu {
+  position: absolute; bottom: 34px; left: 0;
+  width: 380px;
+  background: #fff0fc;
+  border: 2px solid #aa0077;
+  border-top-color: #ff99ee;
+  border-left-color: #ff99ee;
+  box-shadow: 4px 0 16px rgba(150,0,120,.5);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden; z-index: 20;
+  display: none;
+}
+.xpd-startmenu.open { display: block; }
+
+.xpd-sm-header {
+  background: linear-gradient(to right, #5b0092, #cc00bb 60%, #ff99ee);
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px; color: #fff;
+}
+.xpd-sm-avatar { font-size: 34px; filter: drop-shadow(0 0 6px rgba(255,200,255,.6)); }
+.xpd-sm-user { font-size: 15px; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,.5); }
+
+.xpd-sm-body { display: grid; grid-template-columns: 1fr 1fr; }
+.xpd-sm-left  { background: #fff; border-right: 1px solid #ddbbcc; padding: 6px 0; }
+.xpd-sm-right { background: #fce8ff; padding: 6px 0; }
+
+.xpd-sm-item {
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; color: #220033;
+  transition: background .07s; display: flex; align-items: center; gap: 6px;
+}
+.xpd-sm-item:hover { background: #cc0099; color: #fff; }
+
+.xpd-sm-ritem {
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  cursor: pointer; color: #5b0092;
+  transition: background .07s;
+}
+.xpd-sm-ritem:hover { background: #cc0099; color: #fff; }
+
+.xpd-sm-footer {
+  background: #f0d8ff;
+  border-top: 1px solid #ddbbcc;
+  padding: 6px 10px;
+  display: flex; justify-content: flex-end; gap: 6px;
+}
+.xpd-sm-footbtn {
+  padding: 4px 12px; font-size: 12px; font-weight: 700;
+  font-family: 'Nunito', Tahoma, sans-serif;
+  border: 1px solid #cc88cc;
+  border-top-color: #fff8ff; border-left-color: #fff8ff;
+  background: #fce8ff; cursor: pointer; border-radius: 6px;
+  color: #330033;
+}
+.xpd-sm-footbtn:hover { background: #cc0099; color: #fff; border-color: #880066; }
+
+/* Dark mode desktop adjustments */
+:root.dark #xpDesktop .xpd-window { background: #1a0028; border-color: #440066; }
+:root.dark #xpDesktop .xpd-win-body { background: #0d0015; color: #ffccff; }
+:root.dark #xpDesktop .xpd-win-body textarea { background: #1a0028; color: #ffccff; }
+:root.dark #xpDesktop .xpd-sm-left  { background: #1a0028; }
+:root.dark #xpDesktop .xpd-sm-right { background: #120020; }
+:root.dark #xpDesktop .xpd-sm-item  { color: #ffccff; }
+:root.dark #xpDesktop .xpd-sm-ritem { color: #ff88ff; }
+:root.dark #xpDesktop .xpd-sm-footer { background: #1a0028; border-color: #440066; }
+:root.dark #xpDesktop .xpd-sm-footbtn { background: #220033; color: #ffccff; border-color: #660099; }
+:root.dark #xpDesktop .xpd-startmenu { background: #1a0028; border-color: #660099; }
+
+/* ── Resize handle on mini windows ──────────────────────────────── */
+.xpd-resize-handle {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 18px; height: 18px;
+  cursor: se-resize;
+  z-index: 10;
+  background: linear-gradient(135deg,
+    transparent 40%,
+    rgba(200,0,160,.4) 40%,
+    rgba(200,0,160,.4) 55%,
+    transparent 55%,
+    transparent 65%,
+    rgba(200,0,160,.4) 65%,
+    rgba(200,0,160,.4) 80%,
+    transparent 80%
+  );
+  border-bottom-right-radius: 4px;
+  touch-action: none;
+}
+
+/* ── Desktop icons: horizontal scroll row on mobile ─────────────── */
+@media (max-width: 600px) {
+  .xpd-icons {
+    top: auto;
+    bottom: 40px;
+    left: 0; right: 0;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(0,0,0,.25);
+    backdrop-filter: blur(4px);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .xpd-icons::-webkit-scrollbar { display: none; }
+
+  .xpd-icon {
+    min-width: 62px;
+    flex-shrink: 0;
+    padding: 5px 4px;
+  }
+  .xpd-icon span:first-child { font-size: 26px; }
+
+  /* Start menu full-width */
+  .xpd-startmenu {
+    width: min(380px, 100vw);
+    left: 0; right: 0;
+  }
+
+  /* Taskbar buttons smaller, clock hidden on very small */
+  .xpd-taskbtn { max-width: 80px; font-size: 9px; padding: 2px 5px; }
+  .xpd-clock   { display: none; }
+  .xpd-start   { padding: 2px 8px 2px 6px; font-size: 11px; }
+  .xpd-start-logo { font-size: 13px; }
+
+  /* Windows: ensure they don't overflow and are scrollable */
+  .xpd-window {
+    max-width: calc(100vw - 8px) !important;
+    max-height: calc(100vh - 80px) !important;
+  }
+
+  /* Start menu two-column → single column on very small screens */
+  .xpd-sm-body { grid-template-columns: 1fr; }
+  .xpd-sm-left  { border-right: none; border-bottom: 1px solid #ddbbcc; }
+}
+
+@media (max-width: 400px) {
+  .xpd-tray-icon { display: none; }
+  .xpd-tray { padding: 0 4px; }
+}
