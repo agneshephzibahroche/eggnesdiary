@@ -7,6 +7,27 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="easter.css">
   <script src="theme.js"></script>
+  <script>
+    // ── Password gate — change PASSWORD to your own password ─────────
+    (function () {
+      const PASSWORD = 'eggnesdiary2025';
+      const KEY = 'eggnesdiary_auth';
+      if (sessionStorage.getItem(KEY) !== '1') {
+        const input = prompt('🔒 eggnesdiary editor — password required');
+        if (input !== PASSWORD) {
+          document.documentElement.innerHTML =
+            '<body style="font-family:Tahoma,sans-serif;display:flex;align-items:center;' +
+            'justify-content:center;height:100vh;margin:0;background:#fff0fc">' +
+            '<div style="text-align:center"><div style="font-size:48px">🔒</div>' +
+            '<p style="color:#880066;font-weight:700;font-size:18px">Access denied.</p>' +
+            '<a href="index.html" style="color:#cc00bb;font-size:14px">← Go to viewer</a>' +
+            '</div></body>';
+          throw new Error('auth');
+        }
+        sessionStorage.setItem(KEY, '1');
+      }
+    })();
+  </script>
   <style>
     /* Editor overrides */
     .detail-actions { display: flex; }

@@ -4,23 +4,23 @@ let currentView   = 'icons';
 let selectedId    = null;
 
 // ── Init ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await initData();
   renderTree();
   renderFiles();
+
   document.getElementById('btnSearch').addEventListener('click', openSearch);
   document.getElementById('btnUp').addEventListener('click', () => selectFolder('all'));
   document.getElementById('btnBack').addEventListener('click', () => selectFolder('all'));
 
-  // Live sync: re-render when editor saves in another tab
-  window.addEventListener('storage', e => {
-    if (e.key === STORAGE_KEY) {
-      renderTree();
-      renderFiles();
-      if (selectedId) {
-        const still = getEntry(selectedId);
-        if (still) openEntry(selectedId);
-        else closeDetail();
-      }
+  // Live sync: Firebase SSE — updates the moment editor saves
+  subscribeToChanges(() => {
+    renderTree();
+    renderFiles();
+    if (selectedId) {
+      const still = getEntry(selectedId);
+      if (still) openEntry(selectedId);
+      else closeDetail();
     }
   });
 

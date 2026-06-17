@@ -5,7 +5,8 @@ let selectedId    = null;
 let editingId     = null;   // null = new entry
 
 // ── Init ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await initData();
   renderTree();
   renderFiles();
 
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Seed demo data if completely empty
+  // Seed demo data only if Firebase is completely empty
   if (getEntries().length === 0) seedDemo();
 });
 
@@ -408,9 +409,9 @@ function doImport(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = async ev => {
     try {
-      importData(ev.target.result);
+      await importData(ev.target.result);
       document.getElementById('dataMsg').textContent = '✓ Imported successfully. Reloading…';
       setTimeout(() => location.reload(), 900);
     } catch (_) {

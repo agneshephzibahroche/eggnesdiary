@@ -1,6 +1,6 @@
-// Data layer — localStorage backed
+// Data layer — Firebase Realtime Database (REST API)
 
-const STORAGE_KEY = 'eggnesdiary_v1';
+const DB_URL = 'https://eggnesdiary-2a9e2-default-rtdb.asia-southeast1.firebasedatabase.app/diary';
 
 const DEFAULT_FOLDERS = [
   { id: 'reads',   name: 'Reads',   icon: '📚' },
@@ -11,86 +11,113 @@ const DEFAULT_FOLDERS = [
   { id: 'misc',    name: 'Misc',    icon: '📁' },
 ];
 
-function loadData() {
+let _cache = null;
+
+// ── Bootstrap ─────────────────────────────────────────────────────
+async function initData() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (_) {}
-  return { folders: DEFAULT_FOLDERS, entries: [] };
+    const r = await fetch(DB_URL + '.json');
+    const d = await r.json();
+    _cache = (d && Array.isArray(d.entries)) ? d : { folders: DEFAULT_FOLDERS, entries: [] };
+  } catch (_) {
+    _cache = { folders: DEFAULT_FOLDERS, entries: [] };
+  }
 }
 
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function _data() { return _cache || { folders: DEFAULT_FOLDERS, entries: [] }; }
+
+// ── Write to Firebase ─────────────────────────────────────────────
+function _persist() {
+  return fetch(DB_URL + '.json', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(_cache),
+  });
 }
 
-function getData() { return loadData(); }
+// ── Real-time subscription (SSE) ──────────────────────────────────
+// Used by the viewer to update live when editor saves.
+function subscribeToChanges(callback) {
+  const es = new EventSource(DB_URL + '.json');
+  es.addEventListener('put', e => {
+    try {
+      const msg = JSON.parse(e.data);
+      // msg.path '/' means full replace; deeper paths mean partial update
+      if (msg.path === '/' && msg.data) {
+        _cache = msg.data;
+        callback();
+      } else if (msg.data !== null) {
+        // Refetch on partial update to keep things simple
+        fetch(DB_URL + '.json').then(r => r.json()).then(d => {
+          if (d) { _cache = d; callback(); }
+        });
+      }
+    } catch (_) {}
+  });
+  es.addEventListener('patch', () => {
+    fetch(DB_URL + '.json').then(r => r.json()).then(d => {
+      if (d) { _cache = d; callback(); }
+    });
+  });
+  return es;
+}
 
-function getFolders() { return loadData().folders; }
-
-function getEntries(folderId) {
-  const { entries } = loadData();
+// ── Read helpers (synchronous — use after initData) ───────────────
+function getFolders()          { return _data().folders; }
+function getEntries(folderId)  {
+  const { entries } = _data();
   return folderId ? entries.filter(e => e.folderId === folderId) : entries;
 }
+function getEntry(id)          { return _data().entries.find(e => e.id === id) || null; }
 
-function getEntry(id) {
-  return loadData().entries.find(e => e.id === id) || null;
-}
-
+// ── Write helpers ─────────────────────────────────────────────────
 function createEntry(entry) {
-  const data = loadData();
   const newEntry = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     ...entry,
   };
-  data.entries.unshift(newEntry);
-  saveData(data);
+  _cache.entries.unshift(newEntry);
+  _persist();
   return newEntry;
 }
 
 function updateEntry(id, patch) {
-  const data = loadData();
-  const idx = data.entries.findIndex(e => e.id === id);
+  const idx = _cache.entries.findIndex(e => e.id === id);
   if (idx === -1) return null;
-  data.entries[idx] = { ...data.entries[idx], ...patch, updatedAt: new Date().toISOString() };
-  saveData(data);
-  return data.entries[idx];
+  _cache.entries[idx] = { ..._cache.entries[idx], ...patch, updatedAt: new Date().toISOString() };
+  _persist();
+  return _cache.entries[idx];
 }
 
 function deleteEntry(id) {
-  const data = loadData();
-  data.entries = data.entries.filter(e => e.id !== id);
-  saveData(data);
+  _cache.entries = _cache.entries.filter(e => e.id !== id);
+  _persist();
 }
 
+// ── Import / Export ───────────────────────────────────────────────
 function exportData() {
-  return JSON.stringify(loadData(), null, 2);
+  return JSON.stringify(_data(), null, 2);
 }
 
-function importData(json) {
+async function importData(json) {
   const parsed = JSON.parse(json);
-  saveData(parsed);
+  _cache = parsed;
+  await _persist();
 }
 
-// File-type icons based on entry type
+// ── Formatting helpers ────────────────────────────────────────────
 const TYPE_ICONS = {
-  reads:   '📖',
-  links:   '🌐',
-  essays:  '📄',
-  outfits: '👗',
-  media:   '🎞️',
-  misc:    '📋',
+  reads: '📖', links: '🌐', essays: '📄',
+  outfits: '👗', media: '🎞️', misc: '📋',
 };
 
-function fileIcon(folderId) {
-  return TYPE_ICONS[folderId] || '📋';
-}
+function fileIcon(folderId)  { return TYPE_ICONS[folderId] || '📋'; }
 
 function formatDate(iso) {
   if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function formatSize(content) {
