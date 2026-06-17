@@ -5,9 +5,17 @@ let selectedId    = null;
 
 // ── Init ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  showSkeleton();
   await initData();
   renderTree();
   renderFiles();
+
+  // Permalink: open entry from URL hash on load
+  const hash = location.hash;
+  if (hash.startsWith('#entry/')) {
+    const id = hash.slice(7);
+    if (getEntry(id)) openEntry(id);
+  }
 
   document.getElementById('btnSearch').addEventListener('click', openSearch);
   document.getElementById('btnUp').addEventListener('click', () => selectFolder('all'));
@@ -35,6 +43,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); openSearch(); }
   });
 });
+
+// ── Skeleton ──────────────────────────────────────────────────────
+function showSkeleton() {
+  const grid = document.getElementById('fileGrid');
+  grid.className = 'file-grid view-icons';
+  grid.innerHTML = Array(8).fill(0).map(() =>
+    `<div class="file-icon-item skeleton-card"></div>`
+  ).join('');
+}
 
 // ── Tree ──────────────────────────────────────────────────────────
 function renderTree() {
@@ -170,7 +187,8 @@ function listRow(e, folders) {
 // ── Entry detail ──────────────────────────────────────────────────
 function openEntry(id, expand) {
   selectedId = id;
-  renderFiles(); // re-render to update selection highlight
+  history.replaceState(null, '', '#entry/' + id);
+  renderFiles();
 
   const entry   = getEntry(id);
   if (!entry) return;
@@ -185,10 +203,26 @@ function openEntry(id, expand) {
 
   document.getElementById('statusSel').textContent = `"${entry.title}" selected`;
 
+  // Copy-link button in header
+  const existingBtn = document.getElementById('copyLinkBtn');
+  if (existingBtn) existingBtn.remove();
+  const copyBtn = document.createElement('button');
+  copyBtn.id = 'copyLinkBtn';
+  copyBtn.className = 'copy-link-btn';
+  copyBtn.textContent = '🔗 Copy link';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(location.href).then(() => {
+      copyBtn.textContent = '✓ Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = '🔗 Copy link'; copyBtn.classList.remove('copied'); }, 2000);
+    });
+  };
+  document.getElementById('dh-info') || document.querySelector('.dh-info');
+  document.getElementById('detailPanel').querySelector('.detail-header').appendChild(copyBtn);
+
   const body = document.getElementById('detailBody');
   let html = '';
 
-  // Meta
   if (entry.tags && entry.tags.length) {
     html += `<div class="tag-list">${entry.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>`;
   }
@@ -197,17 +231,14 @@ function openEntry(id, expand) {
   if (entry.author) html += `<div class="meta-row"><strong>Author</strong>${esc(entry.author)}</div>`;
   if (entry.source) html += `<div class="meta-row"><strong>Source</strong><a class="entry-link" href="${esc(entry.source)}" target="_blank" rel="noreferrer">${esc(entry.source)}</a></div>`;
 
-  // Image
   if (entry.imageUrl) {
     html += `<img class="entry-image" src="${esc(entry.imageUrl)}" alt="${esc(entry.title)}">`;
   }
 
-  // Content
   if (entry.content) {
-    html += `<div class="entry-content">${esc(entry.content)}</div>`;
+    html += `<div class="entry-content">${renderContent(entry.content)}</div>`;
   }
 
-  // Link
   if (entry.url && !entry.source) {
     html += `<a class="entry-link" href="${esc(entry.url)}" target="_blank" rel="noreferrer">🔗 ${esc(entry.url)}</a>`;
   }
@@ -218,7 +249,10 @@ function openEntry(id, expand) {
 function closeDetail() {
   document.getElementById('detailPanel').classList.add('hidden');
   selectedId = null;
+  history.replaceState(null, '', location.pathname);
   document.getElementById('statusSel').textContent = 'Nothing selected';
+  const btn = document.getElementById('copyLinkBtn');
+  if (btn) btn.remove();
   renderFiles();
 }
 
@@ -298,4 +332,15 @@ window.addEventListener('load', () => {
 // ── Helpers ───────────────────────────────────────────────────────
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderContent(content) {
+  if (!content) return '';
+  const isHtml = /<[a-z][\s\S]*>/i.test(content);
+  if (isHtml) {
+    return typeof DOMPurify !== 'undefined'
+      ? DOMPurify.sanitize(content)
+      : content.replace(/<script[\s\S]*?<\/script>/gi, '');
+  }
+  return esc(content).replace(/\n/g, '<br>');
 }

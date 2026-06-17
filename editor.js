@@ -6,6 +6,7 @@ let editingId     = null;   // null = new entry
 
 // ── Init ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  showSkeleton();
   await initData();
   renderTree();
   renderFiles();
@@ -29,6 +30,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Seed demo data only if Firebase is completely empty
   if (getEntries().length === 0) seedDemo();
 });
+
+// ── Skeleton ──────────────────────────────────────────────────────
+function showSkeleton() {
+  const grid = document.getElementById('fileGrid');
+  grid.className = 'file-grid view-icons';
+  grid.innerHTML = Array(8).fill(0).map(() =>
+    `<div class="file-icon-item skeleton-card"></div>`
+  ).join('');
+}
 
 // ── Demo seed ─────────────────────────────────────────────────────
 function seedDemo() {
@@ -199,7 +209,7 @@ function openEntry(id) {
   if (entry.source)   html += `<div class="meta-row"><strong>Source</strong>${esc(entry.source)}</div>`;
   if (entry.url)      html += `<div class="meta-row"><strong>URL</strong><a class="entry-link" href="${esc(entry.url)}" target="_blank" rel="noreferrer">${esc(entry.url)}</a></div>`;
   if (entry.imageUrl) html += `<img class="entry-image" src="${esc(entry.imageUrl)}" alt="${esc(entry.title)}">`;
-  if (entry.content)  html += `<div class="entry-content">${esc(entry.content)}</div>`;
+  if (entry.content)  html += `<div class="entry-content">${renderContent(entry.content)}</div>`;
 
   body.innerHTML = html;
 }
@@ -272,7 +282,7 @@ function editEntry(id) {
   document.getElementById('fieldUrl').value     = entry.url || '';
   document.getElementById('fieldSource').value  = entry.source || '';
   document.getElementById('fieldImageUrl').value = entry.imageUrl || '';
-  document.getElementById('fieldContent').value = entry.content || '';
+  document.getElementById('fieldContent').innerHTML = entry.content || '';
   previewImg();
   countChars();
   document.getElementById('entryModal').classList.add('open');
@@ -280,9 +290,10 @@ function editEntry(id) {
 }
 
 function clearForm() {
-  ['fieldTitle','fieldAuthor','fieldTags','fieldUrl','fieldSource','fieldImageUrl','fieldContent'].forEach(id => {
+  ['fieldTitle','fieldAuthor','fieldTags','fieldUrl','fieldSource','fieldImageUrl'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.getElementById('fieldContent').innerHTML = '';
   document.getElementById('imgPreview').style.display = 'none';
   document.getElementById('charCount').textContent = '0 characters';
   document.getElementById('folderGrid').innerHTML = buildFolderGrid('reads');
@@ -314,7 +325,7 @@ function saveEntry() {
     url:      document.getElementById('fieldUrl').value.trim()      || undefined,
     source:   document.getElementById('fieldSource').value.trim()   || undefined,
     imageUrl: document.getElementById('fieldImageUrl').value.trim() || undefined,
-    content:  document.getElementById('fieldContent').value.trim()  || undefined,
+    content:  document.getElementById('fieldContent').innerHTML.trim() || undefined,
   };
 
   if (editingId) {
@@ -380,9 +391,25 @@ function previewImg() {
 
 // ── Char count ────────────────────────────────────────────────────
 function countChars() {
-  const len = document.getElementById('fieldContent').value.length;
+  const len = (document.getElementById('fieldContent').innerText || '').length;
   document.getElementById('charCount').textContent =
     len.toLocaleString() + ' character' + (len !== 1 ? 's' : '');
+}
+
+// ── Rich text formatting ──────────────────────────────────────────
+function fmt(cmd) {
+  document.getElementById('fieldContent').focus();
+  document.execCommand(cmd, false, null);
+}
+function fmtHeading() {
+  document.getElementById('fieldContent').focus();
+  document.execCommand('formatBlock', false, 'h2');
+}
+function fmtLink() {
+  const url = prompt('Enter URL:');
+  if (!url) return;
+  document.getElementById('fieldContent').focus();
+  document.execCommand('createLink', false, url);
 }
 
 // ── Import / Export ───────────────────────────────────────────────
@@ -444,4 +471,15 @@ window.addEventListener('load', () => {
 // ── Helpers ───────────────────────────────────────────────────────
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderContent(content) {
+  if (!content) return '';
+  const isHtml = /<[a-z][\s\S]*>/i.test(content);
+  if (isHtml) {
+    return typeof DOMPurify !== 'undefined'
+      ? DOMPurify.sanitize(content)
+      : content.replace(/<script[\s\S]*?<\/script>/gi, '');
+  }
+  return esc(content).replace(/\n/g, '<br>');
 }

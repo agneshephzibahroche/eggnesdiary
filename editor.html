@@ -240,7 +240,19 @@
 
       <div class="form-group">
         <label>Content / Notes</label>
-        <textarea id="fieldContent" placeholder="Write your notes, quotes, thoughts…" oninput="countChars()"></textarea>
+        <div class="rich-toolbar">
+          <button type="button" class="rich-btn" onclick="fmt('bold')" title="Bold"><b>B</b></button>
+          <button type="button" class="rich-btn" onclick="fmt('italic')" title="Italic"><i>I</i></button>
+          <div class="rich-sep"></div>
+          <button type="button" class="rich-btn" onclick="fmtHeading()" title="Heading">H₂</button>
+          <button type="button" class="rich-btn" onclick="fmt('insertUnorderedList')" title="Bullet list">• List</button>
+          <div class="rich-sep"></div>
+          <button type="button" class="rich-btn" onclick="fmtLink()" title="Insert link">🔗 Link</button>
+          <button type="button" class="rich-btn" onclick="fmt('removeFormat')" title="Clear formatting">✕ Clear</button>
+        </div>
+        <div id="fieldContent" class="rich-editor" contenteditable="true"
+             data-placeholder="Write your notes, quotes, thoughts…"
+             oninput="countChars()"></div>
         <div class="char-count" id="charCount">0 characters</div>
       </div>
 
@@ -296,6 +308,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 <script src="data.js"></script>
 <script src="editor.js"></script>
 <script src="easter.js"></script>
